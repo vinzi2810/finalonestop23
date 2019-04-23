@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    
+    <mvc:annotation-driven/> <!-- Must require to enable @ResponseBody annotation -->
+    
+   <!-- Configuring the JDBC connection-->
+   <bean id="dataSourceBean" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+      <property name="url" value="jdbc:mysql://localhost:3306/project1" />
+      <property name="username" value="root" />
+      <property name="password" value="password-1" />
+   </bean>
+    
+   <!-- Configuring the Hibernate4 Session Factory Bean -->
+   <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+      <property name="dataSource" ref="dataSourceBean" />
+      <property name="mappingResources">
+         <list>
+            <value>com/pojo/User.hbm.xml</value>
+            <value>com/pojo/addhospitalmodel.hbm.xml</value>
+            <value>com/pojo/DoctorDetails.hbm.xml</value>
+            <value>com/pojo/patientBookingDetails.hbm.xml</value>  
+            <value>com/pojo/Appointment.hbm.xml</value>          
+            
+         </list>
+      </property>
+      <property name="hibernateProperties">
+         <props>
+            <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+            <prop key="hibernate.show_sql">true</prop>
+            <prop key="hibernate.hbm2ddl.auto">update</prop>
+            
+         </props>
+         
+      </property>
+      <property name="packagesToScan">
+            <array>
+                <value>com/pojo/*</value>
+            </array>
+        </property>
+     
+   </bean>
+    
+   <bean id="hibernateTemplateBean" class="org.springframework.orm.hibernate4.HibernateTemplate">
+      <property name="sessionFactory" ref="sessionFactory" />
+      <property name="checkWriteOperations" value="false"></property>
+   </bean>
+   
+
+    
+   <bean id="authenticateServiceBean" class="com.service.AuthService">
+      <property name="hibernateTemplate" ref="hibernateTemplateBean" />
+   </bean>
+   
+
+   <bean id="appointmentServiceBean" class="com.service.AppointmentService">
+      <property name="hibernateTemplate" ref="hibernateTemplateBean" />
+   </bean>
+
+ 
+     <bean id="registrationService" class="com.service.RegistrationService">
+      <property name="hibernateTemplate" ref="hibernateTemplateBean" />
+   </bean>
+   
+ </beans>
